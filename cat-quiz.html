@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🐱 你是哪种猫？——人猫塑人格测试</title>
+<style>
+  :root {
+    --bg: #fef9f0;
+    --card: #ffffff;
+    --accent: #f4a460;
+    --accent2: #ff8c69;
+    --text: #4a3728;
+    --sub: #8b7355;
+    --paw: #ffd4b8;
+    --progress-bg: #f0e0d0;
+    --shadow: 0 4px 24px rgba(120, 80, 40, 0.10);
+    --radius: 20px;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'PingFang SC', 'Microsoft YaHei', 'Noto Sans SC', sans-serif;
+    background: linear-gradient(135deg, #fef6e8 0%, #fce4d0 30%, #fde8d8 60%, #fef3e4 100%);
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    max-width: 100vw;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    top: -120px; right: -80px;
+    width: 300px; height: 300px;
+    background: radial-gradient(circle, rgba(244,164,96,0.15) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+  body::after {
+    content: '';
+    position: fixed;
+    bottom: -100px; left: -60px;
+    width: 260px; height: 260px;
+    background: radial-gradient(circle, rgba(255,140,105,0.12) 0%, transparent 70%);
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    position: relative;
+    z-index: 1;
+    width: 100%;
+    max-width: 600px;
+  }
+
+  /* ====== 顶部 ====== */
+  .header {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .header h1 {
+    font-size: 2rem;
+    color: var(--text);
+    letter-spacing: 0.02em;
+  }
+  .header .subtitle {
+    font-size: 0.95rem;
+    color: var(--sub);
+    margin-top: 4px;
+  }
+
+  /* ====== 进度 ====== */
+  .progress-wrap {
+    background: var(--progress-bg);
+    border-radius: 20px;
+    height: 10px;
+    margin-bottom: 4px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    border-radius: 20px;
+    transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    width: 0%;
+  }
+  .progress-info {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.8rem;
+    color: var(--sub);
+    margin-bottom: 16px;
+  }
+
+  /* ====== 卡片 ====== */
+  .card {
+    background: var(--card);
+    border-radius: var(--radius);
+    padding: 32px 28px;
+    box-shadow: var(--shadow);
+    transition: transform 0.3s, opacity 0.3s;
+  }
+  .card.fade-out {
+    opacity: 0;
+    transform: translateY(-12px);
+  }
+
+  .dimension-tag {
+    display: inline-block;
+    background: var(--paw);
+    color: var(--accent2);
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 12px;
+    border-radius: 20px;
+    margin-bottom: 10px;
+  }
+  .question-number {
+    display: inline-block;
+    font-size: 0.8rem;
+    color: var(--sub);
+    margin-left: 8px;
+  }
+  .question-text {
+    font-size: 1.2rem;
+    color: var(--text);
+    line-height: 1.6;
+    margin-bottom: 24px;
+    font-weight: 600;
+  }
+
+  /* ====== 选项 ====== */
+  .options { display: flex; flex-direction: column; gap: 12px; }
+
+  .option {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 16px 18px;
+    border: 2px solid #f0e0d0;
+    border-radius: 16px;
+    cursor: pointer;
+    transition: all 0.2s;
+    background: #fefcf9;
+    user-select: none;
+  }
+  .option:hover {
+    border-color: var(--accent);
+    background: #fff8f2;
+    transform: translateX(3px);
+  }
+  .option.selected {
+    border-color: var(--accent2);
+    background: #fff3ea;
+    box-shadow: 0 2px 12px rgba(255,140,105,0.18);
+  }
+  .option-letter {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    background: var(--paw);
+    color: var(--accent2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+    font-size: 0.9rem;
+    flex-shrink: 0;
+    transition: all 0.2s;
+  }
+  .option.selected .option-letter {
+    background: var(--accent2);
+    color: #fff;
+  }
+  .option-text { font-size: 1rem; color: var(--text); line-height: 1.5; }
+
+  /* ====== 按钮 ====== */
+  .btn-row {
+    display: flex;
+    gap: 12px;
+    margin-top: 24px;
+    justify-content: space-between;
+  }
+  .btn {
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.03em;
+  }
+  .btn-back {
+    background: #f0e8dd;
+    color: var(--sub);
+  }
+  .btn-back:hover { background: #e5d8c8; }
+  .btn-next {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(244,164,96,0.35);
+  }
+  .btn-next:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244,164,96,0.45);
+  }
+  .btn-next:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  /* ====== 结果页 ====== */
+  .result-wrap { text-align: center; }
+  .result-emoji {
+    font-size: 5rem;
+    margin-bottom: 12px;
+    animation: bounceIn 0.7s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  }
+  @keyframes bounceIn {
+    0% { transform: scale(0); opacity: 0; }
+    60% { transform: scale(1.15); }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .result-type {
+    font-size: 1.8rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 6px;
+  }
+  .result-tagline {
+    font-size: 1rem;
+    color: var(--accent2);
+    font-style: italic;
+    margin-bottom: 20px;
+  }
+
+  /* ====== 雷达图区域 ====== */
+  .radar-section {
+    margin: 20px auto;
+    max-width: 380px;
+  }
+  .radar-title {
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 8px;
+  }
+
+  /* 简易四维柱状条 */
+  .dimension-bars {
+    text-align: left;
+    margin: 16px 0;
+  }
+  .dim-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 10px;
+    text-align: center;
+  }
+  .dim-row {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+    gap: 10px;
+  }
+  .dim-label {
+    width: 80px;
+    font-size: 0.82rem;
+    color: var(--text);
+    flex-shrink: 0;
+    text-align: right;
+  }
+  .dim-bar-bg {
+    flex: 1;
+    height: 20px;
+    background: #f0e0d0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .dim-bar-fill {
+    height: 100%;
+    border-radius: 10px;
+    transition: width 1s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .dim-val {
+    width: 30px;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: var(--text);
+    flex-shrink: 0;
+  }
+
+  /* 四个维度的颜色 */
+  .dim-social-bar    { background: linear-gradient(90deg, #f9c58e, #f4a460); }
+  .dim-fun-bar       { background: linear-gradient(90deg, #7ec8a0, #43b380); }
+  .dim-spend-bar     { background: linear-gradient(90deg, #f9a8b8, #e88395); }
+  .dim-sleep-bar     { background: linear-gradient(90deg, #c8b6d6, #a18cd1); }
+
+  .result-desc {
+    text-align: left;
+    background: #fefcf9;
+    border-radius: 16px;
+    padding: 20px;
+    margin-top: 16px;
+    line-height: 1.8;
+    color: var(--text);
+    font-size: 0.95rem;
+  }
+  .result-desc h4 {
+    color: var(--accent2);
+    margin: 14px 0 6px;
+    font-size: 1rem;
+  }
+  .result-desc h4:first-child { margin-top: 0; }
+
+  /* 彩蛋 */
+  .easter-egg-badge {
+    display: inline-block;
+    background: #ffe0b0;
+    color: #c77d20;
+    font-weight: 700;
+    font-size: 0.8rem;
+    padding: 4px 14px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    animation: pulse 1.5s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.6; }
+  }
+
+  .confetti {
+    font-size: 1.5rem;
+    animation: confettiDrop 0.8s ease-out forwards;
+  }
+  @keyframes confettiDrop {
+    0% { transform: translateY(-30px); opacity: 0; }
+    100% { transform: translateY(0); opacity: 1; }
+  }
+
+  .btn-row-result {
+    display: flex;
+    gap: 10px;
+    margin-top: 20px;
+    justify-content: center;
+  }
+  .btn-restart {
+    background: #fff;
+    color: var(--accent2);
+    border: 2px solid var(--accent2);
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.03em;
+  }
+  .btn-restart:hover { background: #fff3ea; }
+  .btn-share {
+    background: linear-gradient(135deg, var(--accent2), var(--accent));
+    color: #fff;
+    box-shadow: 0 4px 14px rgba(244,164,96,0.35);
+    padding: 12px 28px;
+    border-radius: 30px;
+    font-size: 1rem;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s;
+    letter-spacing: 0.03em;
+  }
+  .btn-share:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(244,164,96,0.45);
+  }
+
+  /* ====== 平板适配 ====== */
+  @media (max-width: 768px) {
+    .container { max-width: 100%; padding: 0 4px; }
+    .header h1 { font-size: 1.7rem; }
+    .header .subtitle { font-size: 0.88rem; }
+    .card { padding: 26px 20px; border-radius: 16px; }
+    .question-text { font-size: 1.1rem; }
+    .option { padding: 14px 14px; gap: 12px; border-radius: 14px; }
+    .option-text { font-size: 0.93rem; }
+    .option-letter { width: 34px; height: 34px; font-size: 0.85rem; flex-shrink: 0; }
+    .btn { padding: 11px 22px; font-size: 0.93rem; }
+    .result-emoji { font-size: 4rem; }
+    .result-type { font-size: 1.5rem; }
+    .dim-label { width: 70px; font-size: 0.75rem; }
+    .dim-val { font-size: 0.75rem; width: auto; min-width: 80px; }
+    .result-desc { padding: 16px; font-size: 0.9rem; }
+  }
+
+  /* ====== 手机适配 ====== */
+  @media (max-width: 480px) {
+    body {
+      padding: 12px 8px;
+      align-items: flex-start;
+      padding-top: 24px;
+    }
+
+    /* 缩小背景装饰 */
+    body::before {
+      width: 180px; height: 180px;
+      top: -60px; right: -40px;
+    }
+    body::after {
+      width: 160px; height: 160px;
+      bottom: -60px; left: -30px;
+    }
+
+    .container { max-width: 100%; padding: 0; }
+
+    /* 头部 */
+    .header { margin-bottom: 16px; }
+    .header h1 { font-size: 1.35rem; }
+    .header .subtitle { font-size: 0.8rem; }
+
+    /* 进度条 */
+    .progress-wrap { height: 8px; margin-bottom: 2px; }
+    .progress-info { font-size: 0.72rem; margin-bottom: 10px; flex-wrap: wrap; gap: 4px; }
+
+    /* 卡片 */
+    .card {
+      padding: 20px 16px;
+      border-radius: 14px;
+    }
+
+    /* 维度标签 & 题号 */
+    .dimension-tag { font-size: 0.7rem; padding: 3px 10px; }
+    .question-number { font-size: 0.7rem; margin-left: 4px; }
+
+    /* 题目 */
+    .question-text { font-size: 0.98rem; margin-bottom: 16px; line-height: 1.5; }
+
+    /* 选项 */
+    .option {
+      padding: 12px 10px;
+      gap: 10px;
+      border-radius: 12px;
+      border-width: 1.5px;
+    }
+    .option:active {
+      background: #fff3ea;
+      border-color: var(--accent2);
+    }
+    .option-letter {
+      width: 32px;
+      height: 32px;
+      min-width: 32px;
+      font-size: 0.78rem;
+    }
+    .option-text { font-size: 0.88rem; line-height: 1.4; }
+
+    /* 按钮 */
+    .btn-row { gap: 8px; margin-top: 18px; }
+    .btn {
+      padding: 11px 18px;
+      font-size: 0.9rem;
+      border-radius: 26px;
+      white-space: nowrap;
+    }
+    .btn-back { padding: 11px 14px; }
+    .btn-next { padding: 11px 20px; }
+
+    /* 结果页 */
+    .result-wrap { padding: 0; }
+    .result-emoji { font-size: 3.5rem; margin-bottom: 8px; }
+    .result-type { font-size: 1.3rem; }
+    .result-tagline { font-size: 0.85rem; margin-bottom: 14px; }
+
+    /* 维度条形图 */
+    .dimension-bars { margin: 12px 0; }
+    .dim-title { font-size: 0.8rem; margin-bottom: 8px; }
+    .dim-row { gap: 6px; margin-bottom: 6px; flex-wrap: nowrap; align-items: center; }
+    .dim-label {
+      width: 65px;
+      font-size: 0.7rem;
+      text-align: left;
+      flex-shrink: 0;
+    }
+    .dim-bar-bg { height: 16px; flex: 1; min-width: 50px; }
+    .dim-val {
+      font-size: 0.68rem;
+      width: auto;
+      min-width: 70px;
+      text-align: left;
+      flex-shrink: 0;
+    }
+
+    /* 结果描述 */
+    .result-desc {
+      padding: 14px 12px;
+      font-size: 0.85rem;
+      line-height: 1.7;
+      border-radius: 12px;
+      margin-top: 12px;
+    }
+    .result-desc h4 { font-size: 0.9rem; margin: 10px 0 4px; }
+
+    /* 结果按钮 */
+    .btn-row-result {
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 14px;
+    }
+    .btn-restart, .btn-share {
+      width: 100%;
+      text-align: center;
+      padding: 13px 0;
+      font-size: 0.95rem;
+    }
+
+    /* 彩蛋 */
+    .easter-egg-badge {
+      font-size: 0.7rem;
+      padding: 3px 10px;
+      margin-bottom: 8px;
+    }
+
+    /* 防止横向溢出 */
+    .score-row { gap: 6px; }
+    .score-label { width: 55px; font-size: 0.7rem; }
+    .score-val { width: 22px; font-size: 0.7rem; }
+  }
+
+  /* ====== 超小屏（折叠机 / 320px） ====== */
+  @media (max-width: 360px) {
+    .header h1 { font-size: 1.2rem; }
+    .card { padding: 16px 12px; }
+    .question-text { font-size: 0.9rem; }
+    .option { padding: 10px 8px; gap: 8px; }
+    .option-letter { width: 28px; height: 28px; min-width: 28px; font-size: 0.7rem; }
+    .option-text { font-size: 0.82rem; }
+    .btn { font-size: 0.82rem; padding: 10px 14px; }
+    .dim-label { width: 55px; font-size: 0.65rem; }
+    .dim-val { font-size: 0.65rem; min-width: 65px; }
+    .result-emoji { font-size: 3rem; }
+    .result-type { font-size: 1.1rem; }
+    .dimension-tag { font-size: 0.65rem; padding: 2px 8px; }
+    .progress-info { font-size: 0.68rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🐱 你是哪种猫？</h1>
+    <p class="subtitle">16 道题 · 四个维度 · 测出你的隐藏猫格</p>
+  </div>
+  <div class="progress-wrap">
+    <div class="progress-bar" id="progressBar"></div>
+  </div>
+  <div class="progress-info">
+    <span id="progressDim">社交习惯</span>
+    <span id="progressText">1 / 16</span>
+  </div>
+  <div class="card" id="card"></div>
+</div>
+
+<script>
+// ============================================================
+// 数据定义：16 题，四个维度，各 4 题
+// A=高冷猫 B=社交猫 C=冒险猫 D=黏人猫
+// ============================================================
+const QUESTIONS = [
+
+  // ---------- 维度一：社交习惯 (Q1-Q4) ----------
+  {
+    dim: '社交习惯',
+    q: '周五晚上朋友突然约你明天去一场大型聚会，你的第一反应是？',
+    options: [
+      { letter: 'A', text: '心里默默评估：多少人？在哪？多久结束？再决定去不去', cat: 'aloof' },
+      { letter: 'B', text: '秒回"去去去！"然后立刻开始想穿什么', cat: 'social' },
+      { letter: 'C', text: '先打听聚会上有没有好玩的活动或没去过的新地方', cat: 'adventure' },
+      { letter: 'D', text: '先问"谁去？"——如果那个特别的人去，我就去', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '社交习惯',
+    q: '一个不太熟的同事在茶水间突然开始跟你倾诉情感问题，你会？',
+    options: [
+      { letter: 'A', text: '礼貌点头但内心拉响警报：我们的关系到这一步了吗？', cat: 'aloof' },
+      { letter: 'B', text: '立刻进入知心模式，拉把椅子坐下聊，茶水凉了再续', cat: 'social' },
+      { letter: 'C', text: '觉得挺新鲜——原来还可以从这个角度了解一个人！', cat: 'adventure' },
+      { letter: 'D', text: '认真听完然后帮他/她分析到天黑，比当事人还投入', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '社交习惯',
+    q: '你的社交媒体头像通常是？',
+    options: [
+      { letter: 'A', text: '精心拍摄的背影/侧脸/局部特写，或一只有品位的猫', cat: 'aloof' },
+      { letter: 'B', text: '笑容灿烂的正脸自拍，最好还有朋友们一起', cat: 'social' },
+      { letter: 'C', text: '最近旅行中抓拍的奇奇怪怪的有趣瞬间', cat: 'adventure' },
+      { letter: 'D', text: '和另一半/闺蜜/家人的亲密合照，定期更换', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '社交习惯',
+    q: '在电梯里遇到半生不熟的邻居，那 20 秒你会？',
+    options: [
+      { letter: 'A', text: '微微点头致意，然后专注看楼层数字——沉默是金', cat: 'aloof' },
+      { letter: 'B', text: '主动寒暄"今天天气不错""你家狗狗好可爱"打破尴尬', cat: 'social' },
+      { letter: 'C', text: '注意到对方拎着的袋子，好奇里面装了什么有趣的东西', cat: 'adventure' },
+      { letter: 'D', text: '如果对方先开口就会很开心地聊起来，否则默默紧张', cat: 'clingy' },
+    ]
+  },
+
+  // ---------- 维度二：娱乐习惯 (Q5-Q8) ----------
+  {
+    dim: '娱乐习惯',
+    q: '一个没有安排的周六下午，你最可能出现在哪里？',
+    options: [
+      { letter: 'A', text: '窝在精心布置的家里，泡茶/手冲咖啡，沉浸在一本好书或一部电影中', cat: 'aloof' },
+      { letter: 'B', text: '约了三五好友在网红咖啡馆，拍照聊天两不误', cat: 'social' },
+      { letter: 'C', text: '临时买了张票去看展览/音乐节/脱口秀——今天就是要不一样', cat: 'adventure' },
+      { letter: 'D', text: '和最喜欢的人在一起，哪怕只是在沙发上刷手机也很幸福', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '娱乐习惯',
+    q: '当全网都在刷一部新剧的时候，你通常？',
+    options: [
+      { letter: 'A', text: '不急，等口碑稳定了再决定看不看——不从众是我的风格', cat: 'aloof' },
+      { letter: 'B', text: '立刻开看！不然明天上班没法加入午饭讨论', cat: 'social' },
+      { letter: 'C', text: '刷十分钟看看合不合胃口，不合就果断弃——时间要留给更新鲜的', cat: 'adventure' },
+      { letter: 'D', text: '得看有没有人陪我一起看，一个人追剧太孤单了', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '娱乐习惯',
+    q: '你的手机里占用内存最多的是？',
+    options: [
+      { letter: 'A', text: '精心分类的相册、读书笔记、播客缓存——精神食粮不能少', cat: 'aloof' },
+      { letter: 'B', text: '各种社交/群聊的聊天记录和无数张合影', cat: 'social' },
+      { letter: 'C', text: '旅行攻略截图、地图离线包、打卡记录——世界那么大', cat: 'adventure' },
+      { letter: 'D', text: '和重要的人的聊天记录、合照、语音消息——舍不得删', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '娱乐习惯',
+    q: '假期旅行，你对"完美行程"的定义是？',
+    options: [
+      { letter: 'A', text: '一两个核心体验，剩下时间随性漫步——松弛感才是真奢侈', cat: 'aloof' },
+      { letter: 'B', text: '好吃好拍好出片，回头发朋友圈能收获 100 个赞那种', cat: 'social' },
+      { letter: 'C', text: '塞满冷门打卡点和意外惊喜——跟团游是什么东西？', cat: 'adventure' },
+      { letter: 'D', text: '和旅伴的化学反应比风景重要一万倍，去哪里反而是其次', cat: 'clingy' },
+    ]
+  },
+
+  // ---------- 维度三：消费习惯 (Q9-Q12) ----------
+  {
+    dim: '消费习惯',
+    q: '发工资后你的第一笔"悦己消费"大概率是？',
+    options: [
+      { letter: 'A', text: '种草很久的设计师家居/香薰/黑胶——质感生活值得投资', cat: 'aloof' },
+      { letter: 'B', text: '约朋友吃顿好的！然后顺势逛街买个包/鞋/联名款', cat: 'social' },
+      { letter: 'C', text: '下手那个收藏已久的户外装备/游戏主机/奇怪但有趣的玩意', cat: 'adventure' },
+      { letter: 'D', text: '给重要的人买个礼物——看到对方开心比自己消费更快乐', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '消费习惯',
+    q: '看到"限量""联名""最后一件"这些标签，你的反应是？',
+    options: [
+      { letter: 'A', text: '冷静分析：我真的需要吗？不买立省百分百', cat: 'aloof' },
+      { letter: 'B', text: '立刻截图发群里问"姐妹们冲不冲？"——集体决策最安心', cat: 'social' },
+      { letter: 'C', text: '先研究一下这玩意有什么特别的，有趣就先下手为强', cat: 'adventure' },
+      { letter: 'D', text: '如果某个在意的人也喜欢这个牌子/风格，大概率会冲动', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '消费习惯',
+    q: '关于"仪式感消费"，哪句最像你？',
+    options: [
+      { letter: 'A', text: '"为设计买单、为品味付费，这是我的生活美学"', cat: 'aloof' },
+      { letter: 'B', text: '"重要的不是买了什么，是和朋友一起分享的过程"', cat: 'social' },
+      { letter: 'C', text: '"人生苦短，体验新事物的快乐是最值的投资"', cat: 'adventure' },
+      { letter: 'D', text: '"买东西的意义在于它能让我和在乎的人有更多连接"', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '消费习惯',
+    q: '逛超市的时候，你的路线更像？',
+    options: [
+      { letter: 'A', text: '目标明确按清单走，拿完就走——效率即是正义', cat: 'aloof' },
+      { letter: 'B', text: '逛到零食区就开始在群里直播"这个新口味有人吃过吗"', cat: 'social' },
+      { letter: 'C', text: '每个没吃过的进口食品区都要停留——万一发现宝藏呢', cat: 'adventure' },
+      { letter: 'D', text: '不自觉地逛到对方爱吃的货架前——"这个他/她好像喜欢"', cat: 'clingy' },
+    ]
+  },
+
+  // ---------- 维度四：睡眠习惯 (Q13-Q16) ----------
+  {
+    dim: '睡眠习惯',
+    q: '睡前最后 15 分钟，你通常在做什么？',
+    options: [
+      { letter: 'A', text: '点一盏暖灯，做一套护肤流程或冥想——睡前仪式感拉满', cat: 'aloof' },
+      { letter: 'B', text: '把今天的群聊全爬完、朋友圈点一遍赞，确认没有错过任何八卦', cat: 'social' },
+      { letter: 'C', text: '刷着刷着短视频就打开了某个奇怪的知识点，一查就是一个小时', cat: 'adventure' },
+      { letter: 'D', text: '发完最后一条"晚安"消息，还要等对方回复才舍得闭眼', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '睡眠习惯',
+    q: '你的睡姿更接近以下哪种？',
+    options: [
+      { letter: 'A', text: '端正平躺或优雅侧卧——连睡觉都保持体面', cat: 'aloof' },
+      { letter: 'B', text: '大字型摊开——床是我的，整个都是我的', cat: 'social' },
+      { letter: 'C', text: '入睡时朝东、醒来时朝西——整晚都在床上冒险', cat: 'adventure' },
+      { letter: 'D', text: '必须抱着枕头/玩偶/被子角——怀里没东西睡不着', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '睡眠习惯',
+    q: '闹钟响了，你最有可能？',
+    options: [
+      { letter: 'A', text: '第一个闹钟响就起来，绝不拖延——自律让我自由', cat: 'aloof' },
+      { letter: 'B', text: '按掉闹钟先打开手机看看有没有新消息，用社交唤醒自己', cat: 'social' },
+      { letter: 'C', text: '按掉然后做一个很刺激的梦中梦——"再睡五分钟拯救世界"', cat: 'adventure' },
+      { letter: 'D', text: '按掉闹钟转身抱紧身边的人/枕头——再温存五分钟才肯起', cat: 'clingy' },
+    ]
+  },
+  {
+    dim: '睡眠习惯',
+    q: '关于睡眠环境，你最在意的是？',
+    options: [
+      { letter: 'A', text: '床品材质、房间温度、光线——五星级酒店标准，一丝不苟', cat: 'aloof' },
+      { letter: 'B', text: '手机要放在伸手可及的地方充电——睡前社交不能断', cat: 'social' },
+      { letter: 'C', text: '不在意环境，在哪都能秒睡——机场、火车、甚至站着', cat: 'adventure' },
+      { letter: 'D', text: '气味——枕头上要有熟悉的味道，最好还有某人的气息', cat: 'clingy' },
+    ]
+  },
+];
+
+// ============================================================
+// 结果定义
+// ============================================================
+const RESULTS = {
+  aloof: {
+    emoji: '😼',
+    type: '高冷猫',
+    tagline: '「人类很有意思，但我选择旁观」',
+    color: '#a18cd1',
+    dimBarClass: '',
+    desc: `<h4>🐾 你是：布偶贵族·人间观察家</h4>
+      <p>你拥有与生俱来的优雅气质和独立人格。你不是不合群，只是对社交质量有极高要求——与其泛泛之交，不如独善其身。你喜欢秩序感、审美和深度思考，朋友圈发得不多，但每一条都经得起反复品味。</p>
+      <h4>✨ 猫格优势</h4>
+      <p>🧠 <strong>情绪稳定指数满分</strong>——泰山崩于前而色不变，你是朋友中那个"定海神针"般的存在。<br>
+      🎨 <strong>品味独到</strong>——你的家、穿搭、歌单都有一种"说不清但就是好看"的魔力。<br>
+      🧘 <strong>自洽力拉满</strong>——独处不是孤独，是你主动选择的充电方式。</p>
+      <h4>🎯 你适合的生活方式</h4>
+      <p>一间有阳光和绿植的屋子，一份不被过度打扰的工作，三两个灵魂相契的朋友。周末的理想状态：一杯手冲、一本书、一缕午后阳光。</p>
+      <h4>💭 来自猫界的悄悄话</h4>
+      <p>你习惯把温柔藏得很深，但偶尔露出的柔软瞬间，反而最让人心动。试着主动约一次朋友吧——对方可能已经等你这句话很久了。</p>`
+  },
+  social: {
+    emoji: '😸',
+    type: '社交猫',
+    tagline: '「这世界那么多人，都是潜在的朋友！」',
+    color: '#f4a460',
+    dimBarClass: '',
+    desc: `<h4>🐾 你是：橘座·人间小太阳</h4>
+      <p>你自带暖洋洋的能量场，走到哪里都能让空气升温三度。朋友说你"社牛"，但你只是发自内心地觉得——人最有意思了！你能在五分钟内和陌生人聊得像老朋友，也能记住每个朋友的生日和喜好。</p>
+      <h4>✨ 猫格优势</h4>
+      <p>💬 <strong>情商天花板</strong>——尴尬的冷场？不存在的。有你在的局就是热局。<br>
+      🤝 <strong>人脉即超能力</strong>——从找房子到找对象，你的通讯录就是一本万能攻略。<br>
+      💛 <strong>共情力极强</strong>——朋友哭了你会比她先哭，朋友笑了你比她还开心。</p>
+      <h4>🎯 你适合的生活方式</h4>
+      <p>团队作战而非孤军奋战是你的最优解。社群活动、聚会、合作型工作都让你如鱼得水。群聊里的气氛组担当，表情包储量永远充足。</p>
+      <h4>💭 来自猫界的悄悄话</h4>
+      <p>社交是充电，偶尔的独处也是。不要害怕安静下来面对自己——一个人的时候，你依然是完整的、发光的。</p>`
+  },
+  adventure: {
+    emoji: '🐱',
+    type: '冒险猫',
+    tagline: '「好奇害不死猫，只会让猫更快乐」',
+    color: '#43b380',
+    dimBarClass: '',
+    desc: `<h4>🐾 你是：狸花探险家·人间体验官</h4>
+      <p>你的字典里没有"无聊"这个词。每一个没去过的地方、没尝过的食物、没学过的东西，都在向你发射探索信号。朋友眼中的你永远活力满满，像一只打了永动机补丁的猫——"来都来了"是你的人生哲学。</p>
+      <h4>✨ 猫格优势</h4>
+      <p>⚡ <strong>行动力爆表</strong>——从"想去"到"出发"中间隔不了一条短视频的时间。<br>
+      🌍 <strong>适应力满分</strong>——把你丢到任何一个陌生城市，你都能活出本地人的松弛感。<br>
+      🔥 <strong>永远好奇永远年轻</strong>——同龄人开始焦虑中年危机的时候，你刚报了个冲浪班。</p>
+      <h4>🎯 你适合的生活方式</h4>
+      <p>九宫格办公桌关不住你，你需要的是变化、新鲜感和不断突破舒适区。旅行、创业、自由职业、斜杠青年——稳定反而不是你的最优解。</p>
+      <h4>💭 来自猫界的悄悄话</h4>
+      <p>追逐远方的同时，别忘了身后一直有人为你留着灯。有时候，最冒险的事情是——停下来，认真经营一段关系。</p>`
+  },
+  clingy: {
+    emoji: '😻',
+    type: '黏人猫',
+    tagline: '「你在身边，就是最好的天气」',
+    color: '#e88395',
+    dimBarClass: '',
+    desc: `<h4>🐾 你是：英短小甜心·人间小棉袄</h4>
+      <p>你把"深情"活成了一种生活方式。对你在乎的人来说，你是世界上最好的听众、最暖的依靠、最不愿意挂电话的那个人。黏人不是因为你不够独立，而是因为你太懂得关系的珍贵——毕竟，有什么比和爱的人在一起更幸福呢？</p>
+      <h4>✨ 猫格优势</h4>
+      <p>💝 <strong>忠诚度无人能敌</strong>——你认定的人，就是一辈子的事。背叛？你的词典没这个词。<br>
+      🫂 <strong>温柔是超能力</strong>——朋友失恋第一个想到你，因为你懂得怎么接住一颗破碎的心。<br>
+      🌸 <strong>情感丰沛</strong>——你能从一片落叶看到整个秋天，感性让你比大多数人都活得更深刻。</p>
+      <h4>🎯 你适合的生活方式</h4>
+      <p>亲密关系于你而言不是生活的调味品，而是主菜。一份温暖的小工作、一个温馨的小家、几个可以深夜打电话的人——这就是你的顶配人生。</p>
+      <h4>💭 来自猫界的悄悄话</h4>
+      <p>先成为自己的小太阳，再去温暖别人。留一点空间给自己——你值得被爱，也值得学会独处时依然感到完整。</p>`
+  },
+  // 彩蛋结果
+  easteregg: {
+    emoji: '🦥',
+    type: '树懒猫（？）',
+    tagline: '「问卷好长……能不能直接告诉我答案？」',
+    color: '#c0c0c0',
+    dimBarClass: '',
+    desc: `<p style="text-align:center;font-size:1.15rem;margin-bottom:12px;font-weight:600;">🥚✨ <strong>恭喜触发隐藏彩蛋：终极摸鱼大师！</strong> ✨🥚</p>
+      <h4>😼 坦白从宽，抗拒从严</h4>
+      <p>你从第 1 题到第 16 题<strong>全选了同一个选项</strong>！根本没认真看题目吧？我已经想象到你的画面了——手指机械般地点击同一个位置，眼神放空，嘴角微微上扬："做完就完事了"。</p>
+      <h4>🦥 你的真实猫格：树懒猫</h4>
+      <p>传说中的<strong>"问卷刺客·摸鱼圣体·16题全A/B/C/D战士"</strong>！能躺着绝不坐着，能划水绝不认真，连做猫格测试都要走捷径——这已经不是懒了，这是一种<strong>行为艺术</strong>。你用实际行动向世界宣告：<em>"我不是针对谁，我是说所有问卷都值得一个统一的答案。"</em></p>
+      <h4>🎁 彩蛋称号</h4>
+      <p>授予你终身荣誉称号：<br>
+      <strong>🏆「问卷终结者 · 摸鱼大魔王 · 猫界反卷先锋」🏆</strong></p>
+      <h4>🔄 不服？</h4>
+      <p>点下面的按钮认真来一次，这次真的只要 3 分钟！我赌你的猫格不止一种颜色。😼</p>`
+  }
+};
+
+// ============================================================
+// 四个维度名称与条形图颜色类
+// ============================================================
+const DIM_META = {
+  '社交习惯': { icon: '💬', barClass: 'dim-social-bar' },
+  '娱乐习惯': { icon: '🎮', barClass: 'dim-fun-bar' },
+  '消费习惯': { icon: '💰', barClass: 'dim-spend-bar' },
+  '睡眠习惯': { icon: '😴', barClass: 'dim-sleep-bar' },
+};
+
+// ============================================================
+// 状态
+// ============================================================
+let currentQuestion = 0;
+let answers = new Array(QUESTIONS.length).fill(null);
+
+// ============================================================
+// DOM
+// ============================================================
+const card = document.getElementById('card');
+const progressBar = document.getElementById('progressBar');
+const progressText = document.getElementById('progressText');
+const progressDim = document.getElementById('progressDim');
+
+// ============================================================
+// 渲染
+// ============================================================
+function renderQuestion(index) {
+  currentQuestion = index;
+  const q = QUESTIONS[index];
+  const selected = answers[index];
+
+  // 进度
+  const pct = (index / QUESTIONS.length) * 100;
+  progressBar.style.width = pct + '%';
+  progressText.textContent = `${index + 1} / ${QUESTIONS.length}`;
+  progressDim.textContent = DIM_META[q.dim].icon + ' ' + q.dim;
+
+  let optionsHTML = q.options.map(opt => `
+    <div class="option${selected && selected.letter === opt.letter ? ' selected' : ''}"
+         data-letter="${opt.letter}" data-cat="${opt.cat}">
+      <div class="option-letter">${opt.letter}</div>
+      <span class="option-text">${opt.text}</span>
+    </div>
+  `).join('');
+
+  const isLast = index === QUESTIONS.length - 1;
+  const canGoNext = selected !== null;
+
+  card.innerHTML = `
+    <span class="dimension-tag">${DIM_META[q.dim].icon} ${q.dim}</span>
+    <span class="question-number">第 ${index + 1} 题</span>
+    <div class="question-text">${q.q}</div>
+    <div class="options">${optionsHTML}</div>
+    <div class="btn-row">
+      <button class="btn btn-back" id="btnBack" ${index === 0 ? 'style="visibility:hidden"' : ''}>← 上一题</button>
+      <button class="btn btn-next" id="btnNext" ${!canGoNext ? 'disabled' : ''}>
+        ${isLast ? '🐾 揭晓猫格！' : '下一题 →'}
+      </button>
+    </div>
+  `;
+
+  // 绑定选项点击
+  card.querySelectorAll('.option').forEach(el => {
+    el.addEventListener('click', () => {
+      const letter = el.dataset.letter;
+      const cat = el.dataset.cat;
+      answers[index] = { letter, cat };
+      renderQuestion(index);
+    });
+  });
+
+  // 绑定按钮
+  document.getElementById('btnBack').addEventListener('click', () => {
+    if (index > 0) {
+      card.classList.add('fade-out');
+      setTimeout(() => {
+        renderQuestion(index - 1);
+        card.classList.remove('fade-out');
+      }, 200);
+    }
+  });
+
+  document.getElementById('btnNext').addEventListener('click', () => {
+    if (!canGoNext) return;
+    if (isLast) {
+      showResult();
+    } else {
+      card.classList.add('fade-out');
+      setTimeout(() => {
+        renderQuestion(index + 1);
+        card.classList.remove('fade-out');
+      }, 200);
+    }
+  });
+}
+
+// ============================================================
+// 彩蛋检测
+// ============================================================
+function checkEasterEgg() {
+  if (answers.every(a => a && a.letter === answers[0]?.letter)) {
+    return true;
+  }
+  return false;
+}
+
+// ============================================================
+// 分维度计分：每个维度 4 题，每题属于哪个猫格
+// ============================================================
+function calcDimensionScores() {
+  const dims = {};
+  QUESTIONS.forEach((q, i) => {
+    const a = answers[i];
+    if (!a) return;
+    if (!dims[q.dim]) {
+      dims[q.dim] = { aloof: 0, social: 0, adventure: 0, clingy: 0 };
+    }
+    dims[q.dim][a.cat]++;
+  });
+  return dims;
+}
+
+function calcTotalScores() {
+  const scores = { aloof: 0, social: 0, adventure: 0, clingy: 0 };
+  answers.forEach(a => {
+    if (a && scores[a.cat] !== undefined) {
+      scores[a.cat]++;
+    }
+  });
+  return scores;
+}
+
+// ============================================================
+// 每个维度得出一个"代言猫格"
+// ============================================================
+function getDimensionCat(dimScores) {
+  return Object.entries(dimScores).sort((a, b) => b[1] - a[1])[0][0];
+}
+
+const CAT_LABELS = { aloof: '高冷猫', social: '社交猫', adventure: '冒险猫', clingy: '黏人猫' };
+const CAT_EMOJIS = { aloof: '😼', social: '😸', adventure: '🐱', clingy: '😻' };
+
+// ============================================================
+// 结果展示
+// ============================================================
+function showResult() {
+  progressBar.style.width = '100%';
+  progressText.textContent = '完成！';
+  progressDim.textContent = '🏆 结果揭晓';
+
+  const isEasterEgg = checkEasterEgg();
+  const totalScores = calcTotalScores();
+  const dimScores = calcDimensionScores();
+
+  let resultKey, result;
+  if (isEasterEgg) {
+    resultKey = 'easteregg';
+    result = RESULTS.easteregg;
+  } else {
+    resultKey = Object.entries(totalScores).sort((a, b) => b[1] - a[1])[0][0];
+    result = RESULTS[resultKey];
+  }
+
+  // 维度条形图
+  const dimOrder = ['社交习惯', '娱乐习惯', '消费习惯', '睡眠习惯'];
+  const maxPerDim = 4;
+
+  let dimBarsHTML = '';
+  if (!isEasterEgg) {
+    dimBarsHTML = dimOrder.map(dim => {
+      const scores = dimScores[dim] || { aloof: 0, social: 0, adventure: 0, clingy: 0 };
+      const dominantCat = getDimensionCat(scores);
+      const dominantScore = scores[dominantCat];
+      return `
+        <div class="dim-row">
+          <span class="dim-label">${DIM_META[dim].icon} ${dim}</span>
+          <div class="dim-bar-bg">
+            <div class="dim-bar-fill ${DIM_META[dim].barClass}" style="width:0%"
+                 data-width="${(dominantScore / maxPerDim * 100)}%">
+            </div>
+          </div>
+          <span class="dim-val">${CAT_EMOJIS[dominantCat]} ${CAT_LABELS[dominantCat]} ${dominantScore}/4</span>
+        </div>
+      `;
+    }).join('');
+  }
+
+  // 简短解析
+  let dimensionInsight = '';
+  if (!isEasterEgg) {
+    const dimCats = {};
+    dimOrder.forEach(dim => {
+      dimCats[dim] = getDimensionCat(dimScores[dim] || { aloof: 0, social: 0, adventure: 0, clingy: 0 });
+    });
+    dimensionInsight = `
+      <h4>📊 你的四维猫格图谱</h4>
+      <p>你在<strong>社交中</strong>是${CAT_LABELS[dimCats['社交习惯']]}，<strong>娱乐时</strong>化身${CAT_LABELS[dimCats['娱乐习惯']]}，
+      <strong>消费观</strong>偏向${CAT_LABELS[dimCats['消费习惯']]}，而<strong>睡眠</strong>时又变成了${CAT_LABELS[dimCats['睡眠习惯']]}。</p>
+      <p style="font-size:0.9rem;color:var(--sub);margin-top:8px;">
+      ${getDimensionMixCommentary(dimCats)}
+      </p>
+    `;
+  }
+
+  card.innerHTML = `
+    <div class="result-wrap">
+      ${isEasterEgg ? '<div class="easter-egg-badge">🥚 隐藏彩蛋解锁！</div>' : ''}
+      <div class="result-emoji">${result.emoji}</div>
+      <div class="result-type">${isEasterEgg ? result.type : '你是：' + result.type}</div>
+      <div class="result-tagline">${result.tagline}</div>
+      ${dimBarsHTML ? `<div class="dimension-bars"><div class="dim-title">📊 四维猫格雷达</div>${dimBarsHTML}</div>` : ''}
+      <div class="result-desc">
+        ${result.desc}
+        ${dimensionInsight}
+      </div>
+      <div class="btn-row-result">
+        <button class="btn-restart" onclick="restart()">🔄 重新测试</button>
+        <button class="btn-share" onclick="shareResult()">📋 复制结果</button>
+      </div>
+    </div>
+  `;
+
+  // 柱状图动画
+  if (!isEasterEgg) {
+    setTimeout(() => {
+      card.querySelectorAll('.dim-bar-fill').forEach(bar => {
+        const w = bar.getAttribute('data-width');
+        requestAnimationFrame(() => { bar.style.width = w; });
+      });
+    }, 400);
+  }
+}
+
+// ============================================================
+// 混合猫格评语生成
+// ============================================================
+function getDimensionMixCommentary(dimCats) {
+  const vals = Object.values(dimCats);
+  const unique = new Set(vals);
+  if (unique.size === 1) {
+    return '你是罕见的"纯种猫"——四个维度全都是' + CAT_LABELS[vals[0]] + '！你的猫格极其统一，堪称人间珍宝。';
+  }
+  if (unique.size === 4) {
+    return '天呐！你四个维度四种猫格，是真正的"变色龙猫"——集高冷、社交、冒险、黏人于一身，复杂又迷人。';
+  }
+  if (unique.size === 3) {
+    return '你有三种不同的猫格侧面，在不同场景自如切换——这种"多重猫格"魅力让人捉摸不透又欲罢不能。';
+  }
+  return '你在两个猫格之间游走，既有鲜明的主调，又有让人惊喜的反差——像猫一样捉摸不定，才是最高级的魅力。';
+}
+
+// ============================================================
+// 复制结果
+// ============================================================
+function shareResult() {
+  const isEasterEgg = checkEasterEgg();
+  const totalScores = calcTotalScores();
+  let resultKey, resultType;
+  if (isEasterEgg) {
+    resultType = '🦥 树懒猫（摸鱼大师彩蛋）';
+  } else {
+    resultKey = Object.entries(totalScores).sort((a, b) => b[1] - a[1])[0][0];
+    resultType = RESULTS[resultKey].emoji + ' ' + RESULTS[resultKey].type + ' —— ' + RESULTS[resultKey].tagline;
+  }
+
+  const dimScores = calcDimensionScores();
+  const dimOrder = ['社交习惯', '娱乐习惯', '消费习惯', '睡眠习惯'];
+  const dimLines = dimOrder.map(dim => {
+    const cat = getDimensionCat(dimScores[dim] || { aloof: 0, social: 0, adventure: 0, clingy: 0 });
+    return `${DIM_META[dim].icon} ${dim}：${CAT_EMOJIS[cat]} ${CAT_LABELS[cat]}`;
+  }).join('\n');
+
+  const text = `🐱 我的猫格测试结果：${resultType}
+
+📊 四维猫格：
+${dimLines}
+
+来做做看：把本页面分享给朋友即可！`;
+
+  if (navigator.clipboard) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = card.querySelector('.btn-share');
+      const orig = btn.textContent;
+      btn.textContent = '✅ 已复制！发给朋友吧~';
+      setTimeout(() => { btn.textContent = orig; }, 2000);
+    }).catch(() => {
+      alert(text);
+    });
+  } else {
+    alert(text);
+  }
+}
+
+// ============================================================
+// 重新开始
+// ============================================================
+function restart() {
+  answers = new Array(QUESTIONS.length).fill(null);
+  currentQuestion = 0;
+  card.classList.add('fade-out');
+  setTimeout(() => {
+    renderQuestion(0);
+    card.classList.remove('fade-out');
+  }, 200);
+}
+
+// ============================================================
+// 启动
+// ============================================================
+renderQuestion(0);
+</script>
+</body>
+</html>
